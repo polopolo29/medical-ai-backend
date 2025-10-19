@@ -51,6 +51,10 @@ class Shorts_Automator_Pro_Admin {
      * Renderiza la página del dashboard principal del plugin.
      */
     public function render_dashboard_page() {
+        if ( ! Shorts_Automator_Pro_WooCommerce_Integration::has_access() ) {
+            require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin-restricted-access.php';
+            return;
+        }
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/admin-dashboard.php';
     }
 

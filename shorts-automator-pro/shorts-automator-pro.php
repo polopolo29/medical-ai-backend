@@ -69,6 +69,7 @@ final class Shorts_Automator_Pro_Core {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-queue-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cleanup-manager.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-woocommerce-integration.php';
 	}
 
 	private function init() {
@@ -84,6 +85,11 @@ final class Shorts_Automator_Pro_Core {
 		// Hook del sistema de limpieza
 		add_action( 'shorts_automator_after_publish', array( 'Shorts_Automator_Pro_Cleanup_Manager', 'handle_successful_publication' ), 10, 2 );
 		add_action( Shorts_Automator_Pro_Cron_Manager::CLEANUP_CRON_HOOK, array( 'Shorts_Automator_Pro_Cleanup_Manager', 'daily_cleanup_task' ) );
+
+		// Hooks de WooCommerce
+		add_action( 'woocommerce_order_status_completed', array( 'Shorts_Automator_Pro_WooCommerce_Integration', 'on_order_completed' ) );
+		add_action( 'woocommerce_order_status_refunded', array( 'Shorts_Automator_Pro_WooCommerce_Integration', 'on_order_revoked' ) );
+		add_action( 'woocommerce_order_status_cancelled', array( 'Shorts_Automator_Pro_WooCommerce_Integration', 'on_order_revoked' ) );
 	}
 }
 
