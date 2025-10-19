@@ -80,6 +80,61 @@
                 </div>
             </div>
 
+            <!-- Pestaña: Subir Shorts -->
+            <div id="upload-shorts" class="tab-pane" style="display:none;">
+                <h2><?php _e( 'Subir y Programar Shorts', 'shorts-automator-pro' ); ?></h2>
+                <form id="upload-shorts-form">
+                    <div class="form-section">
+                        <h3>1. <?php _e( 'Selecciona el Video', 'shorts-automator-pro' ); ?></h3>
+                        <div id="video-drop-zone">
+                            <button type="button" class="button" id="select-video-button"><?php _e( 'Seleccionar Video de la Biblioteca', 'shorts-automator-pro' ); ?></button>
+                            <div id="video-preview-container" style="display:none;">
+                                <video id="video-preview" controls style="max-width:300px; margin-top:10px;"></video>
+                                <input type="hidden" id="selected-video-id" name="video_id">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>2. <?php _e( 'Selecciona el Perfil de Destino', 'shorts-automator-pro' ); ?></h3>
+                        <select id="profile-selector" name="profile_id" required>
+                            <option value=""><?php _e( 'Selecciona un perfil...', 'shorts-automator-pro' ); ?></option>
+                            <?php foreach ( $profiles as $profile ) : ?>
+                                <option value="<?php echo esc_attr( $profile->id ); ?>"><?php echo esc_html( $profile->name ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>3. <?php _e( 'Selecciona las Plataformas', 'shorts-automator-pro' ); ?></h3>
+                        <div id="platforms-checkboxes">
+                            <!-- Checkboxes se cargarán dinámicamente aquí -->
+                            <p><?php _e( 'Selecciona un perfil para ver las plataformas conectadas.', 'shorts-automator-pro' ); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>4. <?php _e( 'Programa la Publicación', 'shorts-automator-pro' ); ?></h3>
+                        <input type="datetime-local" id="publish-time" name="publish_time" required>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>5. <?php _e( 'Añade los Metadatos', 'shorts-automator-pro' ); ?></h3>
+                        <div class="form-field">
+                            <label for="video-title"><?php _e( 'Título', 'shorts-automator-pro' ); ?></label>
+                            <input type="text" id="video-title" name="title" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="video-description"><?php _e( 'Descripción', 'shorts-automator-pro' ); ?></label>
+                            <textarea id="video-description" name="description"></textarea>
+                        </div>
+                    </div>
+
+                    <?php wp_nonce_field( 'sap_schedule_short_nonce', 'sap_schedule_nonce' ); ?>
+                    <button type="submit" class="button button-primary"><?php _e( 'Programar Short', 'shorts-automator-pro' ); ?></button>
+                </form>
+            </div>
+
         </div> <!-- .tab-content -->
 
     </div> <!-- #shorts-automator-pro-app -->

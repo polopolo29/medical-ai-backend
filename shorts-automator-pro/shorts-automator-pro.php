@@ -62,12 +62,15 @@ final class Shorts_Automator_Pro_Core {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-admin.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-profile-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-platform-manager.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-video-processor.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-queue-manager.php';
 	}
 
 	private function init() {
 		if ( is_admin() ) {
 			new Shorts_Automator_Pro_Admin();
 		}
+		Shorts_Automator_Pro_Video_Processor::add_upload_mime_types_filter();
 	}
 }
 

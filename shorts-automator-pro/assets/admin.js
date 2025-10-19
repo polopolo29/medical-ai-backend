@@ -1,6 +1,16 @@
 jQuery(document).ready(function($) {
     'use strict';
 
+    // Manejo de pestañas
+    $('.nav-tab-wrapper a').on('click', function(e) {
+        e.preventDefault();
+        var tab = $(this).attr('href');
+        $('.nav-tab').removeClass('nav-tab-active');
+        $(this).addClass('nav-tab-active');
+        $('.tab-pane').hide();
+        $(tab).show();
+    });
+
     // Manejar el envío del formulario para crear un nuevo perfil
     $('#create-profile-form').on('submit', function(e) {
         e.preventDefault();
@@ -224,6 +234,117 @@ jQuery(document).ready(function($) {
                     alert('Plataforma desconectada correctamente.');
                     // Recargar el modal para mostrar el nuevo estado
                     $('.manage-connections[data-profile-id="' + profileId + '"]').click();
+                } else {
+                    alert('Error: ' + response.data.message);
+                }
+            },
+            error: function() {
+                alert('Ha ocurrido un error inesperado.');
+            }
+        });
+    });
+
+    // Lógica de subida de videos
+    var mediaUploader;
+
+    $('#select-video-button').on('click', function(e) {
+        e.preventDefault();
+        if (mediaUploader) {
+            mediaUploader.open();
+            return;
+        }
+        mediaUploader = wp.media.frames.file_frame = wp.media({
+            title: 'Elige un Video',
+            button: {
+                text: 'Elegir este Video'
+            },
+            multiple: false,
+            library: {
+                type: 'video'
+            }
+        });
+        mediaUploader.on('select', function() {
+            var attachment = mediaUploader.state().get('selection').first().toJSON();
+            $('#selected-video-id').val(attachment.id);
+            $('#video-preview').attr('src', attachment.url);
+            $('#video-preview-container').show();
+        });
+        mediaUploader.open();
+    });
+
+    // Cargar plataformas al cambiar de perfil en la pestaña de subida
+    $('#profile-selector').on('change', function() {
+        var profileId = $(this).val();
+        var container = $('#platforms-checkboxes');
+
+        if (!profileId) {
+            container.html('<p>Selecciona un perfil para ver las plataformas conectadas.</p>');
+            return;
+        }
+
+        container.html('Cargando...');
+
+        $.ajax({
+            url: sap_ajax.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'sap_get_connections', // Reutilizamos esta acción
+                profile_id: profileId,
+                nonce: sap_ajax.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Adaptar la respuesta HTML a checkboxes
+                    var checkboxesHtml = $(response.data.html).find('.platform-connection-item').map(function() {
+                        var item = $(this);
+                        if (item.find('.status-connected').length > 0) {
+                            var platformName = item.find('h4').text().toLowerCase();
+                            return '<label><input type="checkbox" name="platforms[]" value="' + platformName + '"> ' + platformName.charAt(0).toUpperCase() + platformName.slice(1) + '</label>';
+                        }
+                    }).get().join('');
+                    container.html(checkboxesHtml || '<p>No hay plataformas conectadas para este perfil.</p>');
+                } else {
+                    container.html('<p>Error al cargar las plataformas.</p>');
+                }
+            },
+            error: function() {
+                container.html('<p>Error inesperado.</p>');
+            }
+        });
+    });
+
+    // Manejar el envío del formulario de programación
+    $('#upload-shorts-form').on('submit', function(e) {
+        e.preventDefault();
+
+        var formData = $(this).serializeArray().reduce(function(obj, item) {
+            // Manejar campos de array como 'platforms[]'
+            if (item.name.endsWith('[]')) {
+                var key = item.name.slice(0, -2);
+                if (!obj[key]) {
+                    obj[key] = [];
+                }
+                obj[key].push(item.value);
+            } else {
+                obj[item.name] = item.value;
+            }
+            return obj;
+        }, {});
+
+        formData.action = 'sap_schedule_short';
+        formData.nonce = $('#sap_schedule_nonce').val();
+
+        $.ajax({
+            url: sap_ajax.ajax_url,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    alert(response.data.message);
+                    // Resetear el formulario
+                    $('#upload-shorts-form')[0].reset();
+                    $('#video-preview-container').hide();
+                    $('#platforms-checkboxes').html('<p>Selecciona un perfil para ver las plataformas conectadas.</p>');
                 } else {
                     alert('Error: ' + response.data.message);
                 }

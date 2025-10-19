@@ -29,6 +29,7 @@ class Shorts_Automator_Pro_Admin {
         add_action( 'wp_ajax_sap_get_connections', array( $this, 'ajax_get_connections' ) );
         add_action( 'wp_ajax_sap_save_connection', array( $this, 'ajax_save_connection' ) );
         add_action( 'wp_ajax_sap_disconnect_platform', array( $this, 'ajax_disconnect_platform' ) );
+        add_action( 'wp_ajax_sap_schedule_short', array( $this, 'ajax_schedule_short' ) );
     }
 
     /**
@@ -61,6 +62,8 @@ class Shorts_Automator_Pro_Admin {
         if ( 'toplevel_page_shorts-automator-pro' !== $hook ) {
             return;
         }
+
+        wp_enqueue_media(); // Añadir scripts de la biblioteca de medios
 
         wp_enqueue_style(
             'sap-admin-style',
@@ -313,6 +316,43 @@ class Shorts_Automator_Pro_Admin {
             wp_send_json_success();
         } else {
             wp_send_json_error( array( 'message' => __( 'No se pudo desconectar la plataforma.', 'shorts-automator-pro' ) ) );
+        }
+    }
+
+    /**
+     * Maneja la petición AJAX para programar un short.
+     */
+    public function ajax_schedule_short() {
+        check_ajax_referer( 'sap_schedule_short_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'No tienes permisos.', 'shorts-automator-pro' ) ) );
+        }
+
+        // Validación de datos (simplificada, se puede mejorar)
+        $video_id = isset( $_POST['video_id'] ) ? absint( $_POST['video_id'] ) : 0;
+        $validation = Shorts_Automator_Pro_Video_Processor::validate_attachment( $video_id );
+        if ( is_wp_error( $validation ) ) {
+            wp_send_json_error( array( 'message' => $validation->get_error_message() ) );
+        }
+
+        $data = array(
+            'profile_id'   => isset( $_POST['profile_id'] ) ? absint( $_POST['profile_id'] ) : 0,
+            'video_path'   => get_attached_file( $video_id ),
+            'platforms'    => isset( $_POST['platforms'] ) ? (array) $_POST['platforms'] : array(),
+            'metadata'     => array(
+                'title' => isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '',
+                'description' => isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '',
+            ),
+            'publish_time' => isset( $_POST['publish_time'] ) ? sanitize_text_field( $_POST['publish_time'] ) : '',
+        );
+
+        $queue_id = Shorts_Automator_Pro_Queue_Manager::add_to_queue( $data );
+
+        if ( $queue_id ) {
+            wp_send_json_success( array( 'message' => __( '¡Short programado con éxito!', 'shorts-automator-pro' ) ) );
+        } else {
+            wp_send_json_error( array( 'message' => __( 'No se pudo programar el short.', 'shorts-automator-pro' ) ) );
         }
     }
 }
