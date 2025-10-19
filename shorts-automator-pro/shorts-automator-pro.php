@@ -70,6 +70,7 @@ final class Shorts_Automator_Pro_Core {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cleanup-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-woocommerce-integration.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-publisher.php';
 	}
 
 	private function init() {

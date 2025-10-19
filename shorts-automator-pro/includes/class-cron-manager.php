@@ -66,9 +66,11 @@ class Shorts_Automator_Pro_Cron_Manager {
 			// Marcar como 'publishing' para evitar procesamiento duplicado
 			Shorts_Automator_Pro_Queue_Manager::update_short_status( $short->id, 'publishing' );
 
-			// La lógica de publicación real (simulada) irá en el siguiente paso.
-			// Por ahora, simplemente lo marcamos como publicado para probar el flujo.
-			$published_successfully = true;
+			// Obtener credenciales para el perfil del short.
+			$credentials = Shorts_Automator_Pro_Platform_Manager::get_platform_connections( $short->profile_id );
+
+			// Intentar publicar.
+			$published_successfully = Shorts_Automator_Pro_Publisher::publish( $short, $credentials );
 
 			if ( $published_successfully ) {
 				Shorts_Automator_Pro_Queue_Manager::update_short_status( $short->id, 'published' );
