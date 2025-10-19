@@ -21,7 +21,8 @@ if ( ! defined( 'WPINC' ) ) {
  * El código que se ejecuta durante la activación del plugin.
  */
 function activate_shorts_automator_pro() {
-    // El código de activación irá aquí.
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-database.php';
+    Shorts_Automator_Pro_Database::create_tables();
 }
 register_activation_hook( __FILE__, 'activate_shorts_automator_pro' );
 
