@@ -24,7 +24,9 @@ define( 'SHORTS_AUTOMATOR_PRO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
  */
 function activate_shorts_automator_pro() {
 	require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-database.php';
+	require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
 	Shorts_Automator_Pro_Database::create_tables();
+	Shorts_Automator_Pro_Cron_Manager::schedule_events();
 }
 register_activation_hook( __FILE__, 'activate_shorts_automator_pro' );
 
@@ -32,7 +34,8 @@ register_activation_hook( __FILE__, 'activate_shorts_automator_pro' );
  * El código que se ejecuta durante la desactivación del plugin.
  */
 function deactivate_shorts_automator_pro() {
-	// El código de desactivación irá aquí.
+	require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
+	Shorts_Automator_Pro_Cron_Manager::unschedule_events();
 }
 register_deactivation_hook( __FILE__, 'deactivate_shorts_automator_pro' );
 
@@ -64,6 +67,7 @@ final class Shorts_Automator_Pro_Core {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-platform-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-video-processor.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-queue-manager.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
 	}
 
 	private function init() {
@@ -71,6 +75,9 @@ final class Shorts_Automator_Pro_Core {
 			new Shorts_Automator_Pro_Admin();
 		}
 		Shorts_Automator_Pro_Video_Processor::add_upload_mime_types_filter();
+
+		add_filter( 'cron_schedules', array( 'Shorts_Automator_Pro_Cron_Manager', 'add_custom_cron_interval' ) );
+		add_action( Shorts_Automator_Pro_Cron_Manager::CRON_HOOK, array( 'Shorts_Automator_Pro_Cron_Manager', 'process_publication_queue' ) );
 	}
 }
 

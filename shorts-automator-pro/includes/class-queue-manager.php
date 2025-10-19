@@ -71,4 +71,51 @@ class Shorts_Automator_Pro_Queue_Manager {
 
 		return $result ? $wpdb->insert_id : false;
 	}
+
+	/**
+	 * Obtiene los shorts que están pendientes de publicar.
+	 *
+	 * @return array Un array de objetos, donde cada objeto es un short.
+	 */
+	public static function get_pending_shorts() {
+		global $wpdb;
+		$table_name = self::get_table_name();
+		$now = current_time( 'mysql' );
+
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM $table_name WHERE status = 'scheduled' AND publish_time <= %s",
+				$now
+			)
+		);
+	}
+
+	/**
+	 * Actualiza el estado de un short en la cola.
+	 *
+	 * @param int    $short_id El ID del short.
+	 * @param string $status   El nuevo estado.
+	 * @return bool True si la actualización fue exitosa, false en caso contrario.
+	 */
+	public static function update_short_status( $short_id, $status ) {
+		global $wpdb;
+		$table_name = self::get_table_name();
+
+		$short_id = absint( $short_id );
+		$status   = sanitize_key( $status );
+
+		if ( ! $short_id || empty( $status ) ) {
+			return false;
+		}
+
+		$result = $wpdb->update(
+			$table_name,
+			array( 'status' => $status ),
+			array( 'id' => $short_id ),
+			array( '%s' ),
+			array( '%d' )
+		);
+
+		return $result !== false;
+	}
 }
