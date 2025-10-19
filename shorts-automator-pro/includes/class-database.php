@@ -58,6 +58,7 @@ class Shorts_Automator_Pro_Database {
 		$sql_queue = "CREATE TABLE $table_name_queue (
 			id INT NOT NULL AUTO_INCREMENT,
 			profile_id INT NOT NULL,
+			attachment_id BIGINT(20) UNSIGNED NOT NULL,
 			video_path VARCHAR(255) NOT NULL,
 			platforms TEXT NOT NULL,
 			metadata TEXT NOT NULL,

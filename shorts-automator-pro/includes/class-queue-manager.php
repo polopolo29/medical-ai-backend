@@ -36,9 +36,10 @@ class Shorts_Automator_Pro_Queue_Manager {
 		global $wpdb;
 
 		$defaults = array(
-			'profile_id'   => 0,
-			'video_path'   => '',
-			'platforms'    => '[]',
+			'profile_id'    => 0,
+			'attachment_id' => 0,
+			'video_path'    => '',
+			'platforms'     => '[]',
 			'metadata'     => '{}',
 			'status'       => 'scheduled',
 			'publish_time' => '',
@@ -52,14 +53,16 @@ class Shorts_Automator_Pro_Queue_Manager {
 		$result = $wpdb->insert(
 			self::get_table_name(),
 			array(
-				'profile_id'   => absint( $data['profile_id'] ),
-				'video_path'   => sanitize_text_field( $data['video_path'] ),
-				'platforms'    => wp_json_encode( $data['platforms'] ),
+				'profile_id'    => absint( $data['profile_id'] ),
+				'attachment_id' => absint( $data['attachment_id'] ),
+				'video_path'    => sanitize_text_field( $data['video_path'] ),
+				'platforms'     => wp_json_encode( $data['platforms'] ),
 				'metadata'     => wp_json_encode( $data['metadata'] ),
 				'status'       => $data['status'],
 				'publish_time' => $data['publish_time'],
 			),
 			array(
+				'%d',
 				'%d',
 				'%s',
 				'%s',

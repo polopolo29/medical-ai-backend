@@ -17,24 +17,29 @@ if ( ! defined( 'WPINC' ) ) {
 class Shorts_Automator_Pro_Cron_Manager {
 
 	/**
-	 * Hook para nuestro evento de cron principal.
+	 * Hooks para nuestros eventos de cron.
 	 */
-	const CRON_HOOK = 'shorts_automator_cron';
+	const PUBLISH_CRON_HOOK = 'shorts_automator_cron';
+	const CLEANUP_CRON_HOOK = 'shorts_automator_daily_cleanup';
 
 	/**
-	 * Programa el evento de cron si no está ya programado.
+	 * Programa todos los eventos de cron.
 	 */
 	public static function schedule_events() {
-		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
-			wp_schedule_event( time(), 'ten_minutes', self::CRON_HOOK );
+		if ( ! wp_next_scheduled( self::PUBLISH_CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'ten_minutes', self::PUBLISH_CRON_HOOK );
+		}
+		if ( ! wp_next_scheduled( self::CLEANUP_CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', self::CLEANUP_CRON_HOOK );
 		}
 	}
 
 	/**
-	 * Elimina el evento de cron programado.
+	 * Elimina todos los eventos de cron programados.
 	 */
 	public static function unschedule_events() {
-		wp_clear_scheduled_hook( self::CRON_HOOK );
+		wp_clear_scheduled_hook( self::PUBLISH_CRON_HOOK );
+		wp_clear_scheduled_hook( self::CLEANUP_CRON_HOOK );
 	}
 
 	/**

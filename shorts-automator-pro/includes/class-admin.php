@@ -337,9 +337,10 @@ class Shorts_Automator_Pro_Admin {
         }
 
         $data = array(
-            'profile_id'   => isset( $_POST['profile_id'] ) ? absint( $_POST['profile_id'] ) : 0,
-            'video_path'   => get_attached_file( $video_id ),
-            'platforms'    => isset( $_POST['platforms'] ) ? (array) $_POST['platforms'] : array(),
+            'profile_id'    => isset( $_POST['profile_id'] ) ? absint( $_POST['profile_id'] ) : 0,
+            'attachment_id' => $video_id,
+            'video_path'    => get_attached_file( $video_id ),
+            'platforms'     => isset( $_POST['platforms'] ) ? (array) $_POST['platforms'] : array(),
             'metadata'     => array(
                 'title' => isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '',
                 'description' => isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '',

@@ -68,6 +68,7 @@ final class Shorts_Automator_Pro_Core {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-video-processor.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-queue-manager.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cron-manager.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-cleanup-manager.php';
 	}
 
 	private function init() {
@@ -76,8 +77,13 @@ final class Shorts_Automator_Pro_Core {
 		}
 		Shorts_Automator_Pro_Video_Processor::add_upload_mime_types_filter();
 
+		// Hooks del sistema de publicación (Cron)
 		add_filter( 'cron_schedules', array( 'Shorts_Automator_Pro_Cron_Manager', 'add_custom_cron_interval' ) );
-		add_action( Shorts_Automator_Pro_Cron_Manager::CRON_HOOK, array( 'Shorts_Automator_Pro_Cron_Manager', 'process_publication_queue' ) );
+		add_action( Shorts_Automator_Pro_Cron_Manager::PUBLISH_CRON_HOOK, array( 'Shorts_Automator_Pro_Cron_Manager', 'process_publication_queue' ) );
+
+		// Hook del sistema de limpieza
+		add_action( 'shorts_automator_after_publish', array( 'Shorts_Automator_Pro_Cleanup_Manager', 'handle_successful_publication' ), 10, 2 );
+		add_action( Shorts_Automator_Pro_Cron_Manager::CLEANUP_CRON_HOOK, array( 'Shorts_Automator_Pro_Cleanup_Manager', 'daily_cleanup_task' ) );
 	}
 }
 
