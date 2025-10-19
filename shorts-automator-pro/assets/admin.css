@@ -53,6 +53,11 @@
     display: block;
     margin-bottom: 5px;
 }
+
+/* Estilos de Notificaciones */
+#sap-notifications .notice {
+    margin-bottom: 15px;
+}
 .form-field input[type="text"] {
     width: 100%;
 }

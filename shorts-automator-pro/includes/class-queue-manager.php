@@ -121,4 +121,40 @@ class Shorts_Automator_Pro_Queue_Manager {
 
 		return $result !== false;
 	}
+
+	/**
+	 * Obtiene todos los shorts de la cola, ordenados por fecha de publicación.
+	 *
+	 * @return array
+	 */
+	public static function get_all_from_queue() {
+		global $wpdb;
+		$table_name = self::get_table_name();
+
+		return $wpdb->get_results( "SELECT * FROM $table_name ORDER BY publish_time DESC" );
+	}
+
+	/**
+	 * Elimina un short de la cola.
+	 *
+	 * @param int $short_id El ID del short a eliminar.
+	 * @return bool
+	 */
+	public static function delete_from_queue( $short_id ) {
+		global $wpdb;
+		$table_name = self::get_table_name();
+
+		$short_id = absint( $short_id );
+		if ( ! $short_id ) {
+			return false;
+		}
+
+		$result = $wpdb->delete(
+			$table_name,
+			array( 'id' => $short_id ),
+			array( '%d' )
+		);
+
+		return $result !== false;
+	}
 }

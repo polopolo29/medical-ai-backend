@@ -3,6 +3,8 @@
 
     <div id="shorts-automator-pro-app">
 
+        <div id="sap-notifications"></div>
+
         <!-- Pestañas de Navegación -->
         <h2 class="nav-tab-wrapper">
             <a href="#profiles-management" class="nav-tab nav-tab-active"><?php _e( 'Gestión de Perfiles', 'shorts-automator-pro' ); ?></a>
@@ -133,6 +135,69 @@
                     <?php wp_nonce_field( 'sap_schedule_short_nonce', 'sap_schedule_nonce' ); ?>
                     <button type="submit" class="button button-primary"><?php _e( 'Programar Short', 'shorts-automator-pro' ); ?></button>
                 </form>
+            </div>
+
+            <!-- Pestaña: Programación -->
+            <div id="scheduling" class="tab-pane" style="display:none;">
+                <h2><?php _e( 'Cola de Publicaciones', 'shorts-automator-pro' ); ?></h2>
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th><?php _e( 'Video', 'shorts-automator-pro' ); ?></th>
+                            <th><?php _e( 'Perfil', 'shorts-automator-pro' ); ?></th>
+                            <th><?php _e( 'Plataformas', 'shorts-automator-pro' ); ?></th>
+                            <th><?php _e( 'Fecha Programada', 'shorts-automator-pro' ); ?></th>
+                            <th><?php _e( 'Estado', 'shorts-automator-pro' ); ?></th>
+                            <th><?php _e( 'Acciones', 'shorts-automator-pro' ); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-list">
+                        <?php
+                        $queue = Shorts_Automator_Pro_Queue_Manager::get_all_from_queue();
+                        if ( ! empty( $queue ) ) :
+                            foreach ( $queue as $item ) :
+                                $metadata = json_decode( $item->metadata, true );
+                                $platforms = implode( ', ', json_decode( $item->platforms ) );
+                        ?>
+                        <tr data-queue-id="<?php echo esc_attr( $item->id ); ?>">
+                            <td><?php echo esc_html( $metadata['title'] ?? basename( $item->video_path ) ); ?></td>
+                            <td><?php echo esc_html( 'Perfil ID: ' . $item->profile_id ); // Mejorar para mostrar nombre ?></td>
+                            <td><?php echo esc_html( $platforms ); ?></td>
+                            <td><?php echo esc_html( $item->publish_time ); ?></td>
+                            <td><span class="status-<?php echo esc_attr( $item->status ); ?>"><?php echo esc_html( ucfirst( $item->status ) ); ?></span></td>
+                            <td>
+                                <?php if ( 'scheduled' === $item->status ) : ?>
+                                    <button class="button button-danger cancel-schedule"><?php _e( 'Cancelar', 'shorts-automator-pro' ); ?></button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php
+                            endforeach;
+                        else :
+                        ?>
+                        <tr>
+                            <td colspan="6"><?php _e( 'No hay shorts en la cola.', 'shorts-automator-pro' ); ?></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pestaña: Analíticas -->
+            <div id="analytics" class="tab-pane" style="display:none;">
+                <h2><?php _e( 'Analíticas', 'shorts-automator-pro' ); ?></h2>
+                <div class="notice notice-info">
+                    <p><?php _e( 'Las analíticas avanzadas estarán disponibles en una futura versión del plugin.', 'shorts-automator-pro' ); ?></p>
+                </div>
+                <!-- Placeholder para futuros gráficos -->
+                <div class="analytics-placeholder">
+                    <h3><?php _e( 'Tasa de Éxito de Publicaciones', 'shorts-automator-pro' ); ?></h3>
+                    <p><em><?php _e( '[Gráfico de barras aquí]', 'shorts-automator-pro' ); ?></em></p>
+                </div>
+                <div class="analytics-placeholder">
+                    <h3><?php _e( 'Publicaciones por Plataforma', 'shorts-automator-pro' ); ?></h3>
+                    <p><em><?php _e( '[Gráfico circular aquí]', 'shorts-automator-pro' ); ?></em></p>
+                </div>
             </div>
 
         </div> <!-- .tab-content -->

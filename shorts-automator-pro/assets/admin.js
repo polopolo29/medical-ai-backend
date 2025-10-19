@@ -1,6 +1,22 @@
 jQuery(document).ready(function($) {
     'use strict';
 
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'success') {
+        var noticeClass = type === 'success' ? 'notice-success' : 'notice-error';
+        var notificationHtml = '<div class="notice ' + noticeClass + ' is-dismissible"><p>' + message + '</p></div>';
+
+        var notification = $(notificationHtml);
+        $('#sap-notifications').html(notification);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(function() {
+            notification.fadeOut(500, function() {
+                $(this).remove();
+            });
+        }, 5000);
+    }
+
     // Manejo de pestañas
     $('.nav-tab-wrapper a').on('click', function(e) {
         e.preventDefault();
@@ -19,7 +35,7 @@ jQuery(document).ready(function($) {
         var nonce = $('#sap_nonce').val();
 
         if (!profileName) {
-            alert('Por favor, introduce un nombre para el perfil.');
+            showNotification('Por favor, introduce un nombre para el perfil.', 'error');
             return;
         }
 
@@ -33,13 +49,14 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    location.reload(); // Recargar para mostrar el nuevo perfil
+                    showNotification('Perfil creado con éxito. Recargando...', 'success');
+                    setTimeout(function() { location.reload(); }, 1000);
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.');
+                showNotification('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.', 'error');
             }
         });
     });
@@ -65,15 +82,16 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
+                    showNotification('Perfil eliminado con éxito.', 'success');
                     profileRow.fadeOut(300, function() {
                         $(this).remove();
                     });
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.');
+                showNotification('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.', 'error');
             }
         });
     });
@@ -97,11 +115,8 @@ jQuery(document).ready(function($) {
 
     // Cerrar el modal si se hace clic fuera del contenido
     $(window).on('click', function(e) {
-        if ($(e.target).is('#edit-profile-modal')) {
-            $('#edit-profile-modal').hide();
-        }
-        if ($(e.target).is('#connections-modal')) {
-            $('#connections-modal').hide();
+        if ($(e.target).is('.sap-modal')) {
+            $(e.target).hide();
         }
     });
 
@@ -123,14 +138,15 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
+                    showNotification('Perfil actualizado con éxito.', 'success');
                     $('#edit-profile-modal').hide();
                     $('tr[data-profile-id="' + profileId + '"]').find('td:first').text(newProfileName);
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.');
+                showNotification('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.', 'error');
             }
         });
     });
@@ -145,6 +161,7 @@ jQuery(document).ready(function($) {
         $('#connections-profile-id').val(profileId);
         $('#connections-profile-name').text(profileName);
         $('#platforms-list').html('Cargando...');
+        $('#connections-modal').show();
 
         $.ajax({
             url: sap_ajax.ajax_url,
@@ -157,13 +174,12 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     $('#platforms-list').html(response.data.html);
-                    $('#connections-modal').show();
                 } else {
-                    alert('Error al cargar las conexiones.');
+                    showNotification('Error al cargar las conexiones.', 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado.');
+                showNotification('Ha ocurrido un error inesperado.', 'error');
             }
         });
     });
@@ -195,15 +211,14 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Conexión guardada correctamente.');
-                    // Recargar el modal para mostrar el nuevo estado
-                    $('.manage-connections[data-profile-id="' + profileId + '"]').click();
+                    showNotification('Conexión guardada correctamente.', 'success');
+                    $('#connections-modal').hide();
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado.');
+                showNotification('Ha ocurrido un error inesperado.', 'error');
             }
         });
     });
@@ -231,37 +246,31 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Plataforma desconectada correctamente.');
-                    // Recargar el modal para mostrar el nuevo estado
-                    $('.manage-connections[data-profile-id="' + profileId + '"]').click();
+                    showNotification('Plataforma desconectada correctamente.', 'success');
+                    $('#connections-modal').hide();
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado.');
+                showNotification('Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.', 'error');
             }
         });
     });
 
     // Lógica de subida de videos
     var mediaUploader;
-
     $('#select-video-button').on('click', function(e) {
         e.preventDefault();
         if (mediaUploader) {
             mediaUploader.open();
             return;
         }
-        mediaUploader = wp.media.frames.file_frame = wp.media({
+        mediaUploader = wp.media({
             title: 'Elige un Video',
-            button: {
-                text: 'Elegir este Video'
-            },
+            button: { text: 'Elegir este Video' },
             multiple: false,
-            library: {
-                type: 'video'
-            }
+            library: { type: 'video' }
         });
         mediaUploader.on('select', function() {
             var attachment = mediaUploader.state().get('selection').first().toJSON();
@@ -272,7 +281,7 @@ jQuery(document).ready(function($) {
         mediaUploader.open();
     });
 
-    // Cargar plataformas al cambiar de perfil en la pestaña de subida
+    // Cargar plataformas al cambiar de perfil
     $('#profile-selector').on('change', function() {
         var profileId = $(this).val();
         var container = $('#platforms-checkboxes');
@@ -281,24 +290,16 @@ jQuery(document).ready(function($) {
             container.html('<p>Selecciona un perfil para ver las plataformas conectadas.</p>');
             return;
         }
-
         container.html('Cargando...');
-
         $.ajax({
             url: sap_ajax.ajax_url,
             type: 'POST',
-            data: {
-                action: 'sap_get_connections', // Reutilizamos esta acción
-                profile_id: profileId,
-                nonce: sap_ajax.nonce
-            },
+            data: { action: 'sap_get_connections', profile_id: profileId, nonce: sap_ajax.nonce },
             success: function(response) {
                 if (response.success) {
-                    // Adaptar la respuesta HTML a checkboxes
                     var checkboxesHtml = $(response.data.html).find('.platform-connection-item').map(function() {
-                        var item = $(this);
-                        if (item.find('.status-connected').length > 0) {
-                            var platformName = item.find('h4').text().toLowerCase();
+                        if ($(this).find('.status-connected').length > 0) {
+                            var platformName = $(this).find('h4').text().toLowerCase().trim();
                             return '<label><input type="checkbox" name="platforms[]" value="' + platformName + '"> ' + platformName.charAt(0).toUpperCase() + platformName.slice(1) + '</label>';
                         }
                     }).get().join('');
@@ -318,12 +319,9 @@ jQuery(document).ready(function($) {
         e.preventDefault();
 
         var formData = $(this).serializeArray().reduce(function(obj, item) {
-            // Manejar campos de array como 'platforms[]'
             if (item.name.endsWith('[]')) {
                 var key = item.name.slice(0, -2);
-                if (!obj[key]) {
-                    obj[key] = [];
-                }
+                if (!obj[key]) { obj[key] = []; }
                 obj[key].push(item.value);
             } else {
                 obj[item.name] = item.value;
@@ -340,17 +338,43 @@ jQuery(document).ready(function($) {
             data: formData,
             success: function(response) {
                 if (response.success) {
-                    alert(response.data.message);
-                    // Resetear el formulario
+                    showNotification(response.data.message, 'success');
                     $('#upload-shorts-form')[0].reset();
                     $('#video-preview-container').hide();
                     $('#platforms-checkboxes').html('<p>Selecciona un perfil para ver las plataformas conectadas.</p>');
                 } else {
-                    alert('Error: ' + response.data.message);
+                    showNotification('Error: ' + response.data.message, 'error');
                 }
             },
             error: function() {
-                alert('Ha ocurrido un error inesperado.');
+                showNotification('Ha ocurrido un error inesperado.', 'error');
+            }
+        });
+    });
+
+    // Cancelar programación
+    $('#queue-list').on('click', '.cancel-schedule', function(e) {
+        e.preventDefault();
+        if (!confirm('¿Estás seguro de que quieres cancelar esta programación?')) {
+            return;
+        }
+        var row = $(this).closest('tr');
+        var queueId = row.data('queue-id');
+
+        $.ajax({
+            url: sap_ajax.ajax_url,
+            type: 'POST',
+            data: { action: 'sap_cancel_schedule', queue_id: queueId, nonce: sap_ajax.nonce },
+            success: function(response) {
+                if (response.success) {
+                    showNotification('Programación cancelada con éxito.', 'success');
+                    row.fadeOut(300, function() { $(this).remove(); });
+                } else {
+                    showNotification('Error: ' + response.data.message, 'error');
+                }
+            },
+            error: function() {
+                showNotification('Ha ocurrido un error inesperado.', 'error');
             }
         });
     });

@@ -30,6 +30,7 @@ class Shorts_Automator_Pro_Admin {
         add_action( 'wp_ajax_sap_save_connection', array( $this, 'ajax_save_connection' ) );
         add_action( 'wp_ajax_sap_disconnect_platform', array( $this, 'ajax_disconnect_platform' ) );
         add_action( 'wp_ajax_sap_schedule_short', array( $this, 'ajax_schedule_short' ) );
+        add_action( 'wp_ajax_sap_cancel_schedule', array( $this, 'ajax_cancel_schedule' ) );
     }
 
     /**
@@ -358,6 +359,30 @@ class Shorts_Automator_Pro_Admin {
             wp_send_json_success( array( 'message' => __( '¡Short programado con éxito!', 'shorts-automator-pro' ) ) );
         } else {
             wp_send_json_error( array( 'message' => __( 'No se pudo programar el short.', 'shorts-automator-pro' ) ) );
+        }
+    }
+
+    /**
+     * Maneja la petición AJAX para cancelar una programación.
+     */
+    public function ajax_cancel_schedule() {
+        check_ajax_referer( 'sap_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'No tienes permisos.', 'shorts-automator-pro' ) ) );
+        }
+
+        if ( ! isset( $_POST['queue_id'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Faltan datos.', 'shorts-automator-pro' ) ) );
+        }
+
+        $queue_id = absint( $_POST['queue_id'] );
+        $deleted = Shorts_Automator_Pro_Queue_Manager::delete_from_queue( $queue_id );
+
+        if ( $deleted ) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error( array( 'message' => __( 'No se pudo cancelar la programación.', 'shorts-automator-pro' ) ) );
         }
     }
 }
