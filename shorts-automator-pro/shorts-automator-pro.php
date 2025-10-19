@@ -61,6 +61,7 @@ final class Shorts_Automator_Pro_Core {
 	private function includes() {
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-admin.php';
 		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-profile-manager.php';
+		require_once SHORTS_AUTOMATOR_PRO_PLUGIN_DIR . 'includes/class-platform-manager.php';
 	}
 
 	private function init() {

@@ -59,6 +59,7 @@
                                         <td><?php echo esc_html( $profile->name ); ?></td>
                                         <td><?php echo esc_html( $profile->created_at ); ?></td>
                                         <td>
+                                            <button class="button button-primary manage-connections"><?php _e( 'Gestionar Conexiones', 'shorts-automator-pro' ); ?></button>
                                             <button class="button button-secondary edit-profile"><?php _e( 'Editar', 'shorts-automator-pro' ); ?></button>
                                             <button class="button button-danger delete-profile"><?php _e( 'Eliminar', 'shorts-automator-pro' ); ?></button>
                                         </td>
@@ -96,6 +97,19 @@
                 </div>
                 <button type="submit" class="button button-primary"><?php _e( 'Guardar Cambios', 'shorts-automator-pro' ); ?></button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal para Gestionar Conexiones -->
+    <div id="connections-modal" class="sap-modal" style="display:none;">
+        <div class="sap-modal-content">
+            <span class="sap-modal-close">&times;</span>
+            <h2><?php _e( 'Gestionar Conexiones para', 'shorts-automator-pro' ); ?> <span id="connections-profile-name"></span></h2>
+            <input type="hidden" id="connections-profile-id">
+
+            <div id="platforms-list">
+                <!-- Aquí se cargarán las plataformas dinámicamente -->
+            </div>
         </div>
     </div>
 

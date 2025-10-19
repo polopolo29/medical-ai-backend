@@ -26,6 +26,9 @@ class Shorts_Automator_Pro_Admin {
         add_action( 'wp_ajax_sap_create_profile', array( $this, 'ajax_create_profile' ) );
         add_action( 'wp_ajax_sap_delete_profile', array( $this, 'ajax_delete_profile' ) );
         add_action( 'wp_ajax_sap_update_profile', array( $this, 'ajax_update_profile' ) );
+        add_action( 'wp_ajax_sap_get_connections', array( $this, 'ajax_get_connections' ) );
+        add_action( 'wp_ajax_sap_save_connection', array( $this, 'ajax_save_connection' ) );
+        add_action( 'wp_ajax_sap_disconnect_platform', array( $this, 'ajax_disconnect_platform' ) );
     }
 
     /**
@@ -158,6 +161,158 @@ class Shorts_Automator_Pro_Admin {
             wp_send_json_success();
         } else {
             wp_send_json_error( array( 'message' => __( 'No se pudo actualizar el perfil en la base de datos.', 'shorts-automator-pro' ) ) );
+        }
+    }
+
+    /**
+     * Maneja la petición AJAX para obtener las conexiones de un perfil.
+     */
+    public function ajax_get_connections() {
+        check_ajax_referer( 'sap_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error();
+        }
+
+        if ( ! isset( $_POST['profile_id'] ) ) {
+            wp_send_json_error();
+        }
+
+        $profile_id = absint( $_POST['profile_id'] );
+        $connections = Shorts_Automator_Pro_Platform_Manager::get_platform_connections( $profile_id );
+        $platforms = array( 'facebook', 'instagram', 'tiktok', 'youtube' );
+
+        ob_start();
+        foreach ( $platforms as $platform ) {
+            $is_connected = isset( $connections[ $platform ] );
+            ?>
+            <div class="platform-connection-item">
+                <h4><?php echo ucfirst( $platform ); ?></h4>
+                <div class="connection-status">
+                    <strong><?php _e( 'Estado:', 'shorts-automator-pro' ); ?></strong>
+                    <span class="<?php echo $is_connected ? 'status-connected' : 'status-disconnected'; ?>">
+                        <?php echo $is_connected ? __( 'Conectado', 'shorts-automator-pro' ) : __( 'Desconectado', 'shorts-automator-pro' ); ?>
+                    </span>
+                </div>
+                <button class="button button-secondary toggle-connection-form"><?php echo $is_connected ? __( 'Editar', 'shorts-automator-pro' ) : __( 'Conectar', 'shorts-automator-pro' ); ?></button>
+                <?php if ( $is_connected ) : ?>
+                    <button class="button button-danger disconnect-platform" data-platform="<?php echo esc_attr( $platform ); ?>"><?php _e( 'Desconectar', 'shorts-automator-pro' ); ?></button>
+                <?php endif; ?>
+                <div class="connection-form" style="display:none;">
+                    <?php $this->render_platform_form( $platform, $connections ); ?>
+                </div>
+            </div>
+            <?php
+        }
+        wp_send_json_success( array( 'html' => ob_get_clean() ) );
+    }
+
+    /**
+     * Renderiza el formulario específico para una plataforma.
+     */
+    private function render_platform_form( $platform, $connections ) {
+        $values = isset( $connections[ $platform ] ) ? (array) $connections[ $platform ] : array();
+        ?>
+        <form class="save-connection-form" data-platform="<?php echo esc_attr( $platform ); ?>">
+            <?php
+            switch ( $platform ) {
+                case 'facebook':
+                case 'instagram':
+                    ?>
+                    <div class="form-field">
+                        <label><?php _e( 'App ID', 'shorts-automator-pro' ); ?></label>
+                        <input type="text" name="app_id" value="<?php echo esc_attr( $values['app_id'] ?? '' ); ?>" required>
+                    </div>
+                    <div class="form-field">
+                        <label><?php _e( 'App Secret', 'shorts-automator-pro' ); ?></label>
+                        <input type="password" name="app_secret" value="<?php echo esc_attr( $values['app_secret'] ?? '' ); ?>" required>
+                    </div>
+                    <div class="form-field">
+                        <label><?php _e( 'Access Token', 'shorts-automator-pro' ); ?></label>
+                        <textarea name="access_token" required><?php echo esc_textarea( $values['access_token'] ?? '' ); ?></textarea>
+                    </div>
+                    <?php
+                    break;
+                case 'tiktok':
+                    ?>
+                    <div class="form-field">
+                        <label><?php _e( 'Access Token', 'shorts-automator-pro' ); ?></label>
+                        <textarea name="access_token" required><?php echo esc_textarea( $values['access_token'] ?? '' ); ?></textarea>
+                    </div>
+                    <?php
+                    break;
+                case 'youtube':
+                    ?>
+                    <div class="form-field">
+                        <label><?php _e( 'API Key', 'shorts-automator-pro' ); ?></label>
+                        <input type="text" name="api_key" value="<?php echo esc_attr( $values['api_key'] ?? '' ); ?>" required>
+                    </div>
+                    <div class="form-field">
+                        <label><?php _e( 'Channel ID', 'shorts-automator-pro' ); ?></label>
+                        <input type="text" name="channel_id" value="<?php echo esc_attr( $values['channel_id'] ?? '' ); ?>" required>
+                    </div>
+                    <?php
+                    break;
+            }
+            ?>
+            <button type="submit" class="button button-primary"><?php _e( 'Guardar Conexión', 'shorts-automator-pro' ); ?></button>
+        </form>
+        <?php
+    }
+
+    /**
+     * Maneja la petición AJAX para guardar una conexión.
+     */
+    public function ajax_save_connection() {
+        check_ajax_referer( 'sap_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'No tienes permisos.', 'shorts-automator-pro' ) ) );
+        }
+
+        $required = array( 'profile_id', 'platform', 'credentials' );
+        foreach ( $required as $key ) {
+            if ( ! isset( $_POST[ $key ] ) ) {
+                wp_send_json_error( array( 'message' => __( 'Faltan datos.', 'shorts-automator-pro' ) ) );
+            }
+        }
+
+        $profile_id = absint( $_POST['profile_id'] );
+        $platform = sanitize_key( $_POST['platform'] );
+        parse_str( $_POST['credentials'], $credentials );
+
+        $updated = Shorts_Automator_Pro_Platform_Manager::update_connection( $profile_id, $platform, $credentials );
+
+        if ( $updated ) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error( array( 'message' => __( 'No se pudo guardar la conexión.', 'shorts-automator-pro' ) ) );
+        }
+    }
+
+    /**
+     * Maneja la petición AJAX para desconectar una plataforma.
+     */
+    public function ajax_disconnect_platform() {
+        check_ajax_referer( 'sap_ajax_nonce', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'No tienes permisos.', 'shorts-automator-pro' ) ) );
+        }
+
+        if ( ! isset( $_POST['profile_id'] ) || ! isset( $_POST['platform'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Faltan datos.', 'shorts-automator-pro' ) ) );
+        }
+
+        $profile_id = absint( $_POST['profile_id'] );
+        $platform = sanitize_key( $_POST['platform'] );
+
+        $deleted = Shorts_Automator_Pro_Platform_Manager::delete_connection( $profile_id, $platform );
+
+        if ( $deleted ) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error( array( 'message' => __( 'No se pudo desconectar la plataforma.', 'shorts-automator-pro' ) ) );
         }
     }
 }

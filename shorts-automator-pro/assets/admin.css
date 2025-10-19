@@ -61,3 +61,27 @@
     background-color: #dc3545;
     border-color: #dc3545;
 }
+
+/* Estilos para la lista de conexiones */
+.platform-connection-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+.platform-connection-item h4 {
+    margin-top: 0;
+}
+.connection-status .status-connected {
+    color: #28a745;
+    font-weight: bold;
+}
+.connection-status .status-disconnected {
+    color: #dc3545;
+    font-weight: bold;
+}
+.connection-form {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
