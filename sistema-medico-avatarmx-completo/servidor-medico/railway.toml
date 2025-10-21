@@ -1,0 +1,18 @@
+[deploy]
+buildCommand = "pip install -r requirements.txt"
+startCommand = "python main.py"
+
+[[services]]
+name = "web"
+[http]
+port = 8000
+
+[vars]
+ENVIRONMENT = "production"
+PORT = "8000"
+DATABASE_URL = "postgresql://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE"
+
+[healthcheck]
+path = "/health"
+timeout = 30
+interval = 60
