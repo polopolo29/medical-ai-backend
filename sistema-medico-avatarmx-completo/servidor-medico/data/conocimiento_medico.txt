@@ -1,0 +1,55 @@
+
+==> SECCION: CAUSAS_ORIGEN <==
+
+==> ENFERMEDAD: DIABETES TIPO 2 <==
+La Diabetes Tipo 2 es una condición crónica que afecta la forma en que el cuerpo procesa el azúcar en la sangre (glucosa).
+Mecanismo fisiopatológico: Resistencia a la insulina, donde las células no responden eficazmente a la insulina.
+Factores desencadenantes: Genética, obesidad, sedentarismo y una dieta inadecuada.
+Progresión documentada: Inicialmente, el páncreas produce más insulina para compensar, pero con el tiempo no puede mantener el ritmo, lo que lleva a un exceso de glucosa en la sangre.
+
+==> SECCION: PROTOCOLO_ESPIRITUAL <==
+Este protocolo es universal y debe ser seguido por todos los pacientes para promover el equilibrio mente-cuerpo.
+Video obligatorio: https://www.youtube.com/watch?v=video_espiritual_obligatorio
+Instrucciones literales: Realizar 30 minutos de meditación guiada cada mañana antes de ingerir alimentos. Enfocarse en la respiración y la gratitud.
+Frecuencia definida: Diaria.
+
+==> SECCION: PROTOCOLOS_ESPECIFICOS <==
+
+==> ENFERMEDAD: DIABETES TIPO 2 <==
+Procedimiento documentado: 1. Monitoreo diario de glucosa. 2. Administración de metformina según prescripción. 3. Seguir estrictamente la dieta personalizada.
+Duración del tratamiento: Crónico, requiere manejo de por vida.
+Frecuencia: Diaria.
+Precauciones: Evitar hipoglucemia, revisar los pies diariamente en busca de heridas.
+Evidencia científica: Basado en estudios del American Diabetes Association (ADA).
+
+==> SECCION: DIETAS_POR_NACIONALIDAD <==
+
+==> ENFERMEDAD: DIABETES TIPO 2 <==
+Dieta base: Baja en carbohidratos refinados y azúcares, alta en fibra y proteínas magras.
+Horarios: 5 comidas pequeñas al día para mantener estables los niveles de glucosa.
+
+==> NACIONALIDAD: MEXICANA <==
+Alimentos recomendados: Nopales, aguacate, frijoles negros, pollo asado, tortillas de maíz integral.
+Alimentos a evitar: Refrescos, pan dulce, tortillas de harina, arroz blanco en exceso.
+Preparaciones típicas: Caldo de pollo, ensalada de nopales, pescado a la veracruzana.
+
+==> SECCION: PRODUCTOS_NATURALES <==
+
+==> ENFERMEDAD: DIABETES TIPO 2 <==
+Producto: Canela de Ceylán
+Propiedades: Ayuda a mejorar la sensibilidad a la insulina.
+Dosis recomendada: 1-2 gramos al día.
+Enlace de compra: https://tienda.avatarmx.com/producto/canela-ceylan
+Evidencia científica: Estudios pequeños sugieren un efecto modesto en la reducción de la glucosa en sangre.
+
+==> SECCION: MEDICAMENTOS <==
+
+==> MEDICAMENTO: METFORMINA <==
+Efecto principal: Reduce la producción de glucosa en el hígado.
+Efecto secundario: Malestar estomacal, diarrea.
+Efecto terciario: Riesgo de deficiencia de vitamina B12 con el uso prolongado.
+
+==> MEDICAMENTO: IBUPROFENO <==
+Efecto principal: Antiinflamatorio no esteroideo (AINE), reduce el dolor y la fiebre.
+Efecto secundario: Riesgo de úlceras estomacales.
+Efecto terciario: Puede aumentar la presión arterial.
